@@ -20,8 +20,8 @@ function start() {
             message: "which one?",
             choices: [
                 "view all employees",
-                "view all roles",
-                "view all departments",
+                "view all by roles",
+                "view all by departments",
                 "add employee",
                 "add department",
                 "add role",
@@ -34,18 +34,20 @@ function start() {
                 case "view all employees":
                     viewEmployee();
                     break;
-                case "view all roles":
+                case "view all by roles":
                     viewRole();
                     break;
-
-                case "view all departments":
+                
+                case "view all by departments":
                     viewDepartment();
                     break;
+                case "add department":
+                addDepartment()
+                break;
 
                 case "add employee":
                     addEmployee();
                     break;
-
                 case "update employee role":
                     updatRole();                
                      break;
@@ -62,24 +64,48 @@ start();
 
 function viewEmployee() {
     connection.query("SELECT * FROM employee LEFT JOIN role ON employee.role_id = role.id", function (err, answer) {
-        console.log("\n Departments : \n");
+        console.log("=================================================================================")
         console.table(answer)
     });
     start();
 }
 function viewRole() {
     connection.query("SELECT * FROM role", function (err, answer) {
-        console.log("\n Role : \n");
+        console.log("=================================================================================")
+
         console.table(answer)
     });
     start();
 }
 function viewDepartment() {
     connection.query("SELECT * FROM department", function (err, answer) {
-        console.log("\n Role : \n");
+        console.log("=================================================================================")
         console.table(answer)
     });
     start();
+}
+
+function addDepartment() {
+    inquirer
+        .prompt([
+            {
+                type: "input",
+                message: "Enter Department name",
+                name: "department"
+            }
+        ]).then(function (answer) {
+            connection.query(
+                "INSERT INTO department SET ?",
+                {
+                    name: answer.department,
+                },
+                function (err, answer) {
+                    if (err) throw err;
+                    console.table(answer);
+                }
+            );
+            start();
+        });
 }
 
 function addEmployee() {
@@ -101,13 +127,9 @@ function addEmployee() {
                 {
                     first_name: answer.firstname,
                     last_name: answer.lastname,
-                    role_id: null,
-                    manager_id: null
                 },
                 function (err, answer) {
-                    if (err) {
-                        throw err;
-                    }
+                    if (err) throw err;
                     console.table(answer);
                 }
             );
@@ -123,35 +145,33 @@ function updatRole() {
         let list =
           answer[i].id + " " + answer[i].first_name + " " + answer[i].last_name;
         allEmployee.push(list);
-      }
-      inquirer
-        .prompt([
+      } inquirer.prompt([
           {
             type: "list",
-            name: "updateEmpRole",
+            name: "updateRole",
             message: "select employee to update role",
             choices: allEmployee
           },
           {
             type: "list",
             message: "select new role",
-            choices: ["manager", "employee"],
-            name: "newrole"
+            choices: [ "engineering" , "manager", "employee"],
+            name: "role"
           }
         ])
         .then(function(answer) {
-          let idUpdate = {};
-          idUpdate.employeeId = parseInt(answer.updateEmpRole.split(" ")[0]);
-          if (answer.newrole === "manager") {
-            idUpdate.role_id = 1;
-          } else if (answer.newrole === "employee") {
-            idUpdate.role_id = 2;
+          let idChange = [];
+          idChange.employeeId = parseInt(answer.updateRole.split(" ")[0]);
+          if(answer.role === "engineering"){
+            idChange.role_id = 2;
+          } else if (answer.role === "manager") {
+            idChange.role_id = 1;
+          } else if (answer.role === "employee") {
+            idChange.role_id = 3;
           }
           connection.query(
-            "UPDATE employee SET role_id = ? WHERE id = ?",
-            [idUpdate.role_id, idUpdate.employeeId],
-            function(err, data) {
-                console.log(idUpdate.employeeId);
+            "UPDATE employee SET role_id = ? WHERE id = ?", [idChange.role_id, idChange.employeeId], function(err, answer) {
+                console.log(idChange.employeeId);
                 console.table(answer);
               start();
             }
@@ -167,7 +187,7 @@ function removeEmployee(){
         let list =
           answer[i].id + " " + answer[i].first_name + " " + answer[i].last_name;
         allEmployee.push(list);
-        
+     
       }
       inquirer.prompt
       ([
