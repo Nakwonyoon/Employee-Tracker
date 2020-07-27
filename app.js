@@ -24,7 +24,6 @@ function start() {
                 "view all by departments",
                 "add employee",
                 "add department",
-                "add role",
                 "update employee role",
                 "remove employee",
                 "quit"
@@ -162,11 +161,11 @@ function updatRole() {
         .then(function(answer) {
           let idChange = [];
           idChange.employeeId = parseInt(answer.updateRole.split(" ")[0]);
-          if(answer.role === "engineering"){
-            idChange.role_id = 2;
-          } else if (answer.role === "manager") {
+           if (answer.role === "manager") {
             idChange.role_id = 1;
           } else if (answer.role === "employee") {
+            idChange.role_id = 2;
+          } else if (answer.role === "engineering"){
             idChange.role_id = 3;
           }
           connection.query(
@@ -187,7 +186,6 @@ function removeEmployee(){
         let list =
           answer[i].id + " " + answer[i].first_name + " " + answer[i].last_name;
         allEmployee.push(list);
-     
       }
       inquirer.prompt
       ([
@@ -200,8 +198,9 @@ function removeEmployee(){
       ]).then(function(answer){
         let idUpdate = {};
         idUpdate.employeeId = parseInt(answer.remove.split(" ")[0]);
-        connection.query("DELETE FROM employee WHERE id = ?",function(err, answer){
+        connection.query("DELETE FROM employee WHERE ?",{ id: answer.employeeID }, function(err, answer){
               console.table(answer);
+              start();
           })
       })
 });
