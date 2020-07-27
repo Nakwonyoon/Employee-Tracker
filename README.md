@@ -11,5 +11,5 @@ So that I can organize and plan my business
 ```
 ## Usage
 ![Employee Tracker](Assets/employee-tracker.gif)
-
+![](https://giphy.com/gifs/J2Bw374rNb4iMwDse8/html5)
 Very similart with this instruction.
